@@ -34,6 +34,7 @@ _getErrors = (compiledData) ->
         env:
           node: true
           browser: true
+          mocha: true
         rules:
           'no-undef': 2
           'no-unused-vars': 2
