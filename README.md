@@ -2,13 +2,13 @@
 
 This is a plugin for [Linter](https://github.com/atom-community/linter) that does some
 things that [CoffeeLint](https://github.com/AtomLinter/linter-coffeelint) can't: detecting
-variables that are used before they are defined, and defined variables that aren't used.
+variables that are used without being defined, and defined variables that aren't used.
 
 It's best used in conjunction with
 [linter-coffeelint](https://github.com/AtomLinter/linter-coffeelint).
 
-Behind the scenes it achieves this by compiling your CoffeeScript to JavaScript and
-running it through [ESLint](http://eslint.org), using specific rules.
+Behind the scenes it works by compiling your CoffeeScript to JavaScript and running it
+through [ESLint](http://eslint.org), using specific rules.
 
 Installation
 
