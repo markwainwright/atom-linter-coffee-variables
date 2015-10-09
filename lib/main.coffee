@@ -16,11 +16,9 @@ _lint = (TextEditor) ->
 _compileToJS = (coffeeSource) ->
   try
     results = coffee.compile coffeeSource, sourceMap: true
-
     js        : results.js
     sourceMap : new SourceMapConsumer JSON.parse results.v3SourceMap
     tokens    : coffee.tokens coffeeSource
-
   catch
     null
 
@@ -31,13 +29,14 @@ _getErrors = (compiledData) ->
   try
     allowUnsafeNewFunction ->
       eslint.verify compiledData.js,
-        env:
-          node: true
-          browser: true
-          mocha: true
+        env: do ->
+          envsArray = global.atom.config.get 'linter-coffee-variables.environments'
+          envsObj   = {}
+          envsObj[env] = true for env in envsArray
+          envsObj
         rules:
-          'no-undef': 2
-          'no-unused-vars': 2
+          'no-undef'       : 2
+          'no-unused-vars' : 2
 
   catch
     return []
@@ -79,7 +78,7 @@ _errorToLinterObj = (TextEditor) -> (error) ->
   if typeof error.line isnt 'number' then error.line = 1
   if typeof error.column isnt 'number' then error.column = 0
 
-  endOfLine = TextEditor.getBuffer()?.lineLengthForRow? error.line - 1
+  endOfLine = TextEditor.getBuffer().lineLengthForRow? error.line - 1
 
   type: 'Warning'
   text: error.message
@@ -91,16 +90,24 @@ _errorToLinterObj = (TextEditor) -> (error) ->
 
 
 module.exports =
+  config:
+    environments:
+      type        : 'array'
+      default     : ['browser', 'node', 'es6']
+      description : 'Environments are sets of predefined global variables that are
+        allowed to be used without being defined.
+        See http://eslint.org/docs/user-guide/configuring#specifying-environments for the
+        full list.'
+
   activate: ->
     atomPackageDeps.install 'linter-coffee-variables'
 
   provideLinter: ->
-    name: 'CoffeeVariables'
-    grammarScopes: [
+    name          : 'CoffeeVariables'
+    scope         : 'file'
+    lintOnFly     : true
+    lint          : _lint
+    grammarScopes : [
       'source.coffee'
       'source.litcoffee'
-      'source.coffee.jsx'
     ]
-    scope: 'file' # or 'project'
-    lintOnFly: true # must be false for scope: 'project'
-    lint: _lint
