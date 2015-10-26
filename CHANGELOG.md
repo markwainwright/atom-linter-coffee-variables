@@ -1,3 +1,6 @@
+## 0.4.0
+* Use more specific line positions instead of highlighting entire line
+
 ## 0.3.0
 * Improve package loading time
 * Improve linting time by only running ESLint if compiled JS has changed
