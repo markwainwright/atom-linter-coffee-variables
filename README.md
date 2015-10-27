@@ -1,4 +1,4 @@
-# linter-coffee-variables
+# linter-coffee-variables ![](https://img.shields.io/apm/dm/linter-coffee-variables.svg)
 
 This is a plugin for [Linter](https://github.com/atom-community/linter) that does some
 things that [CoffeeLint](https://github.com/AtomLinter/linter-coffeelint) can't: detecting
