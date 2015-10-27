@@ -1,4 +1,4 @@
-# linter-coffee-variables ![](https://img.shields.io/apm/dm/linter-coffee-variables.svg)
+# [linter-coffee-variables](https://atom.io/packages/linter-coffee-variables) ![](https://img.shields.io/apm/dm/linter-coffee-variables.svg)
 
 This is a plugin for [Linter](https://github.com/atom-community/linter) that does some
 things that [CoffeeLint](https://github.com/AtomLinter/linter-coffeelint) can't: detecting
@@ -13,4 +13,4 @@ through [ESLint](http://eslint.org), using specific rules.
 Installation
 
 1. [Install Linter](https://github.com/atom-community/linter#user-content-how-to--installation)
-2. `$ apm install linter-coffeelint`
+2. `$ apm install linter-coffee-variables`
