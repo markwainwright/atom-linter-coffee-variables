@@ -122,5 +122,8 @@ _lint = (TextEditor) ->
     return []
 
 
-module.exports =
+module.exports = {
   lint: _lint
+  _getEnvs
+  _compileToJS
+}
