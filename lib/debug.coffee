@@ -3,6 +3,7 @@ packageName = 'linter-coffee-variables'
 inDebugMode = ->
   global.atom.config.get(packageName).debug
 
+
 consoleWrapper = (method) ->
   (messages...) ->
     # If debug is enabled in package config, call through to the console[method] function,
@@ -10,6 +11,7 @@ consoleWrapper = (method) ->
     if inDebugMode()
       args = ["[#{ packageName }]"].concat messages
       Function.prototype.apply.call console[method], console, args
+
 
 module.exports =
   log  : consoleWrapper 'log'

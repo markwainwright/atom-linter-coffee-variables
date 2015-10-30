@@ -27,10 +27,11 @@ _compileToJS = (coffeeSource) ->
 
 
 _getEnvs = ->
-  envsArray = global.atom.config.get(packageName).environments
-  envsObj   = {}
-  envsObj[env] = true for env in envsArray
-  envsObj
+  envs = global.atom.config.get(packageName)?.environments or []
+  envs.reduce (obj, env) ->
+    obj[env] = true
+    obj
+  , {}
 
 
 _getESLintErrors = (js) ->
@@ -77,7 +78,8 @@ _addOriginalCodePosition = (sourceMap, variables) -> (error) ->
 
 _lookUpVariablePosition = (variableName, variables) ->
   variables
-    .filter (v) -> v.name is variableName
+    .filter (v) ->
+      v.name is variableName
     .map (v) ->
       line   : v.line
       column : v.column
