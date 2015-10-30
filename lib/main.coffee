@@ -1,3 +1,5 @@
+packageName = 'linter-coffee-variables'
+
 atomPackageDeps       = require 'atom-package-deps'
 linterCoffeeVariables = require './linter-coffee-variables'
 debug                 = require './debug'
@@ -18,7 +20,7 @@ module.exports =
 
   activate: ->
     debug.time 'Activating'
-    atomPackageDeps.install 'linter-coffee-variables'
+    atomPackageDeps.install packageName
     debug.timeEnd 'Activating'
 
   provideLinter: ->

@@ -1,3 +1,6 @@
+## 0.4.1
+* Fix issue #1 - package failing to load due to config being loaded too early
+
 ## 0.4.0
 * Use more specific line positions instead of highlighting entire line
 
