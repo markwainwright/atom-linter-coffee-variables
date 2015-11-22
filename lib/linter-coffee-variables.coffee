@@ -94,7 +94,7 @@ _errorToLinterObj = (filePath) -> (error) ->
   filePath : filePath
   range    : [
     [line - 1, column]
-    [line - 1, column + error.variableName.length]
+    [line - 1, column + error.variableName?.length or 100]
   ]
 
 
