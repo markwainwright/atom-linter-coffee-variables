@@ -25,13 +25,28 @@ describe 'Linting a CoffeeScript fixture', ->
     expectedErrors =
       [
         {
-          'type': 'Warning',
-          'text': '\"bb\" is defined but never used',
-          'filePath': __dirname,
-          'range': [
+          "type": "Warning",
+          "text": "\"b\" is defined but never used",
+          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "range": [
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              1
+            ]
+          ]
+        },
+        {
+          "type": "Warning",
+          "text": "\"c\" is not defined.",
+          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "range": [
             [
               4,
-              0
+              1
             ],
             [
               4,
@@ -40,13 +55,13 @@ describe 'Linting a CoffeeScript fixture', ->
           ]
         },
         {
-          'type': 'Warning',
-          'text': '\"ccc\" is defined but never used',
-          'filePath': __dirname,
-          'range': [
+          "type": "Warning",
+          "text": "\"d\" is not defined.",
+          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "range": [
             [
               5,
-              0
+              2
             ],
             [
               5,
@@ -55,178 +70,119 @@ describe 'Linting a CoffeeScript fixture', ->
           ]
         },
         {
-          'type': 'Warning',
-          'text': '\"dddd\" is defined but never used',
-          'filePath': __dirname,
-          'range': [
-            [
-              6,
-              0
-            ],
-            [
-              6,
-              4
-            ]
-          ]
-        },
-        {
-          'type': 'Warning',
-          'text': '\"func1\" is defined but never used',
-          'filePath': __dirname,
-          'range': [
-            [
-              14,
-              0
-            ],
-            [
-              14,
-              5
-            ]
-          ]
-        },
-        {
-          'type': 'Warning',
-          'text': '\"eeeee\" is not defined.',
-          'filePath': __dirname,
-          'range': [
+          "type": "Warning",
+          "text": "\"e\" is not defined.",
+          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "range": [
             [
               8,
-              0
+              2
             ],
             [
               8,
-              5
+              3
             ]
           ]
         },
         {
-          'type': 'Warning',
-          'text': '\"ggggggg\" is not defined.',
-          'filePath': __dirname,
-          'range': [
+          "type": "Warning",
+          "text": "\"f1a3\" is defined but never used",
+          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "range": [
             [
-              9,
-              0
+              10,
+              18
             ],
             [
-              9,
-              7
+              10,
+              22
             ]
           ]
         },
         {
-          'type': 'Warning',
-          'text': '\"hhhhhhhh\" is not defined.',
-          'filePath': __dirname,
-          'range': [
+          "type": "Warning",
+          "text": "\"f1a4\" is not defined.",
+          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "range": [
             [
               12,
               2
             ],
             [
               12,
+              6
+            ]
+          ]
+        },
+        {
+          "type": "Warning",
+          "text": "\"f2a3\" is not defined.",
+          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "range": [
+            [
+              16,
+              2
+            ],
+            [
+              16,
+              6
+            ]
+          ]
+        },
+        {
+          "type": "Warning",
+          "text": "\"f2a4\" is not defined.",
+          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "range": [
+            [
+              17,
+              2
+            ],
+            [
+              17,
+              6
+            ]
+          ]
+        },
+        {
+          "type": "Warning",
+          "text": "\"f4a1\" is defined but never used",
+          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "range": [
+            [
+              22,
+              6
+            ],
+            [
+              22,
               10
             ]
           ]
         },
         {
-          'type': 'Warning',
-          'text': '\"arg3\" is defined but never used',
-          'filePath': __dirname,
-          'range': [
+          "type": "Warning",
+          "text": "\"f4\" is not defined.",
+          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "range": [
             [
-              14,
-              21
-            ],
-            [
-              14,
-              25
-            ]
-          ]
-        },
-        {
-          'type': 'Warning',
-          'text': '\"arg4\" is not defined.',
-          'filePath': __dirname,
-          'range': [
-            [
-              16,
-              2
-            ],
-            [
-              16,
-              6
-            ]
-          ]
-        },
-        {
-          'type': 'Warning',
-          'text': '\"arg3\" is not defined.',
-          'filePath': __dirname,
-          'range': [
-            [
-              20,
-              2
-            ],
-            [
-              20,
-              6
-            ]
-          ]
-        },
-        {
-          'type': 'Warning',
-          'text': '\"arg4\" is not defined.',
-          'filePath': __dirname,
-          'range': [
-            [
-              21,
-              2
-            ],
-            [
-              21,
-              6
-            ]
-          ]
-        },
-        {
-          'type': 'Warning',
-          'text': '\"func3\" is not defined.',
-          'filePath': __dirname,
-          'range': [
-            [
-              24,
+              28,
               0
             ],
             [
-              24,
-              5
-            ]
-          ]
-        },
-        {
-          'type': 'Warning',
-          'text': '\"usedInF1ButNotF2\" is defined but never used',
-          'filePath': __dirname,
-          'range': [
-            [
-              26,
-              6
-            ],
-            [
-              26,
-              22
+              28,
+              2
             ]
           ]
         }
       ]
 
+    # console.log JSON.stringify errors, null, 2
     expect(JSON.stringify errors).toEqual(JSON.stringify expectedErrors)
 
 
 describe '_getEnvs', ->
   it 'correctly transforms config array to ESLint object', ->
-    expect(do linterCoffeeVariables._getEnvs ).toEqual
+    expect(linterCoffeeVariables._getEnvs()).toEqual
       browser : true
       node    : true
       es6     : true
