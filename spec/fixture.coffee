@@ -1,3 +1,5 @@
+# this comment is to avoid the code starting on line 1
+
 a = '1' # ok
 
 b = '2' # b unused

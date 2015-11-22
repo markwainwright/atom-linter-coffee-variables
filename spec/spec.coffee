@@ -1,5 +1,6 @@
-fs                    = require 'fs'
-path                  = require 'path'
+fs     = require 'fs'
+path   = require 'path'
+expect = require('chai').expect
 
 linterCoffeeVariables = require '../lib/linter-coffee-variables'
 
@@ -30,11 +31,11 @@ describe 'Linting a CoffeeScript fixture', ->
           "filePath": "/Users/mark/web/linter-coffee-variables/spec",
           "range": [
             [
-              2,
+              4,
               0
             ],
             [
-              2,
+              4,
               1
             ]
           ]
@@ -45,11 +46,11 @@ describe 'Linting a CoffeeScript fixture', ->
           "filePath": "/Users/mark/web/linter-coffee-variables/spec",
           "range": [
             [
-              4,
+              6,
               1
             ],
             [
-              4,
+              6,
               2
             ]
           ]
@@ -60,11 +61,11 @@ describe 'Linting a CoffeeScript fixture', ->
           "filePath": "/Users/mark/web/linter-coffee-variables/spec",
           "range": [
             [
-              5,
+              7,
               2
             ],
             [
-              5,
+              7,
               3
             ]
           ]
@@ -75,11 +76,11 @@ describe 'Linting a CoffeeScript fixture', ->
           "filePath": "/Users/mark/web/linter-coffee-variables/spec",
           "range": [
             [
-              8,
+              10,
               2
             ],
             [
-              8,
+              10,
               3
             ]
           ]
@@ -90,11 +91,11 @@ describe 'Linting a CoffeeScript fixture', ->
           "filePath": "/Users/mark/web/linter-coffee-variables/spec",
           "range": [
             [
-              10,
+              12,
               18
             ],
             [
-              10,
+              12,
               22
             ]
           ]
@@ -105,11 +106,11 @@ describe 'Linting a CoffeeScript fixture', ->
           "filePath": "/Users/mark/web/linter-coffee-variables/spec",
           "range": [
             [
-              12,
+              14,
               2
             ],
             [
-              12,
+              14,
               6
             ]
           ]
@@ -120,11 +121,11 @@ describe 'Linting a CoffeeScript fixture', ->
           "filePath": "/Users/mark/web/linter-coffee-variables/spec",
           "range": [
             [
-              16,
+              18,
               2
             ],
             [
-              16,
+              18,
               6
             ]
           ]
@@ -135,11 +136,11 @@ describe 'Linting a CoffeeScript fixture', ->
           "filePath": "/Users/mark/web/linter-coffee-variables/spec",
           "range": [
             [
-              17,
+              19,
               2
             ],
             [
-              17,
+              19,
               6
             ]
           ]
@@ -150,11 +151,11 @@ describe 'Linting a CoffeeScript fixture', ->
           "filePath": "/Users/mark/web/linter-coffee-variables/spec",
           "range": [
             [
-              22,
+              24,
               6
             ],
             [
-              22,
+              24,
               10
             ]
           ]
@@ -165,11 +166,11 @@ describe 'Linting a CoffeeScript fixture', ->
           "filePath": "/Users/mark/web/linter-coffee-variables/spec",
           "range": [
             [
-              28,
+              30,
               0
             ],
             [
-              28,
+              30,
               2
             ]
           ]
@@ -177,12 +178,12 @@ describe 'Linting a CoffeeScript fixture', ->
       ]
 
     # console.log JSON.stringify errors, null, 2
-    expect(JSON.stringify errors).toEqual(JSON.stringify expectedErrors)
+    expect(errors).to.deep.equal expectedErrors
 
 
 describe '_getEnvs', ->
   it 'correctly transforms config array to ESLint object', ->
-    expect(linterCoffeeVariables._getEnvs()).toEqual
+    expect(linterCoffeeVariables._getEnvs()).to.deep.equal
       browser : true
       node    : true
       es6     : true
@@ -192,9 +193,9 @@ describe '_compileToJS', ->
   it 'returns compiled data in correct shape', ->
     {js, sourceMap, variables} = linterCoffeeVariables._compileToJS fixture
 
-    expect(js).toEqual jasmine.any String
-    expect(js).toContain '(function() {'
-    expect(js).toContain '}).call(this);'
+    expect(js).to.be.a 'string'
+    expect(js).to.contain '(function() {'
+    expect(js).to.contain '}).call(this);'
 
-    expect(sourceMap).toEqual jasmine.any Object
-    expect(variables).toEqual jasmine.any Array
+    expect(sourceMap).to.be.an 'object'
+    expect(variables).to.be.an 'array'
