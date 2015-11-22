@@ -53,10 +53,11 @@ _getESLintErrors = (js) ->
 
 
 _addOriginalCodePosition = (sourceMap, variables) -> (error) ->
-  # try/catch blocks always generate an unused `error1` etc variable, so we'll ignore
-  # those
-  # TODO: Attempt to verify that these aren't variables from the user's CoffeeScript code
   variableName = error.message.match(/\".*\"/)?[0]?.replace(/\"/g, '')
+
+  # try/catch blocks always seem to generate an unused `error1` etc variable, so we'll
+  # ignore those
+  # TODO: Attempt to verify that these aren't variables from the user's own code
   return if /^error[0-9]$/.test variableName
 
   # Query the source map for the original position
@@ -64,11 +65,13 @@ _addOriginalCodePosition = (sourceMap, variables) -> (error) ->
     line   : error.line
     column : error.column
 
-  # Coffee sourcemaps don't indicate where variables were originally defined, so we'll use
-  # Coffeescript's generated tokens to work that out. Or we'll do the same if the
-  # sourcemap didn't give us a line number for some reason
-  if error.ruleId is 'no-unused-vars' or not positionFromSourcemap.line
-    positionFromVariableLookup = _lookUpVariablePosition(variableName, variables)[0]
+  # CoffeeScript sourcemaps say that all top-level variables were originally defined on
+  # the same line as the first one was, so if that is the case, we'll resort to using
+  # CoffeeScript's generated tokens to find out where the variable was first defined.
+  firstVariableLine = (variables.map (v) -> v.line).sort((a, b) -> a-b)[0]
+  if (error.ruleId is 'no-unused-vars' and positionFromSourcemap.line <= firstVariableLine) or
+    not positionFromSourcemap.line
+      positionFromVariableLookup = _lookUpVariablePosition(variableName, variables)[0]
 
   message      : error.message
   variableName : variableName
@@ -98,7 +101,7 @@ _errorToLinterObj = (filePath) -> (error) ->
   ]
 
 
-_lint = (TextEditor) ->
+lint = (TextEditor) ->
   debug.time 'Compiling to JS'
   {js, sourceMap, variables} = _compileToJS TextEditor.getText()
   debug.timeEnd 'Compiling to JS'
@@ -123,7 +126,7 @@ _lint = (TextEditor) ->
 
 
 module.exports = {
-  lint: _lint
+  lint
   _getEnvs
   _compileToJS
 }
