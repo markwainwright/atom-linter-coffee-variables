@@ -61,9 +61,7 @@ _addOriginalCodePosition = (sourceMap, variables) -> (error) ->
   return if /^error[0-9]$/.test variableName
 
   # Query the source map for the original position
-  positionFromSourcemap = sourceMap.originalPositionFor
-    line   : error.line
-    column : error.column
+  positionFromSourcemap = sourceMap.originalPositionFor error
 
   # CoffeeScript sourcemaps say that all top-level variables were originally defined on
   # the same line as the first one was, so if that is the case, we'll resort to using
