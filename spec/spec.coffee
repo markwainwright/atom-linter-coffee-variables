@@ -22,13 +22,15 @@ textEditorStub =
 describe 'Linting a CoffeeScript fixture', ->
   it 'returns expected errors', ->
     errors = linterCoffeeVariables.lint textEditorStub
+    filepath = errors[0].filePath
+    expect(filepath).to.include('linter-coffee-variables/spec')
 
     expectedErrors =
       [
         {
           "type": "Warning",
           "text": "\"b\" is defined but never used",
-          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "filePath": filepath,
           "range": [
             [
               4,
@@ -43,7 +45,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"c\" is not defined.",
-          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "filePath": filepath,
           "range": [
             [
               6,
@@ -58,7 +60,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"d\" is not defined.",
-          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "filePath": filepath,
           "range": [
             [
               7,
@@ -73,7 +75,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"e\" is not defined.",
-          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "filePath": filepath,
           "range": [
             [
               10,
@@ -88,7 +90,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"f1a3\" is defined but never used",
-          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "filePath": filepath,
           "range": [
             [
               12,
@@ -103,7 +105,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"f1a4\" is not defined.",
-          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "filePath": filepath,
           "range": [
             [
               14,
@@ -118,7 +120,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"f2a3\" is not defined.",
-          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "filePath": filepath,
           "range": [
             [
               18,
@@ -133,7 +135,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"f2a4\" is not defined.",
-          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "filePath": filepath,
           "range": [
             [
               19,
@@ -148,7 +150,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"f4a1\" is defined but never used",
-          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "filePath": filepath,
           "range": [
             [
               24,
@@ -163,7 +165,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"f4\" is not defined.",
-          "filePath": "/Users/mark/web/linter-coffee-variables/spec",
+          "filePath": filepath,
           "range": [
             [
               30,
