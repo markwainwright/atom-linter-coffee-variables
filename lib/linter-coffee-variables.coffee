@@ -118,6 +118,8 @@ lint = (TextEditor) ->
     cache = js: js, errors: errors
     debug.timeEnd 'Running ESLint'
     return errors
+      # Allow fat arrows to not trigger "this is not defined"
+      .filter (error) -> error.text.indexOf('"_this"') == -1
 
   else
     return []

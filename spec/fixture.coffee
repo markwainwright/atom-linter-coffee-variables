@@ -19,7 +19,7 @@ f2 = (f2a1, f2a2) -> # ok
   f2a3 # arg3 undefined
   f2a4 # arg4 undefined
 
-f3 = (f4a1) -> # ok
+f3 = (f4a1) => # ok with fat arrow
   f4a1.foo # ok
 
 f3 = (f4a1) -> # f4a1 unused
