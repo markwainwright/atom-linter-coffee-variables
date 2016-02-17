@@ -23,3 +23,8 @@ module.exports =
 
   timeEnd: (message) ->
     if inDebugMode() then console.timeEnd "[#{ packageName }] #{ message }"
+
+  table: (message, obj) ->
+    if inDebugMode()
+      console.log "[#{ packageName }] #{ message }"
+      console.table obj

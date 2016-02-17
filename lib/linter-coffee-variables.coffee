@@ -121,7 +121,6 @@ lint = (textEditor) ->
   coffeeSource = textEditor.getText()
   filePath     = textEditor.getPath()
 
-  console.warn 'Cache:', cache
   debug.time 'Compiling to JS'
   {js, rawSourceMap} = _compileToJS coffeeSource
   debug.timeEnd 'Compiling to JS'
@@ -129,6 +128,7 @@ lint = (textEditor) ->
   # If the compiled JS hasn't changed since the last time, use the cached errors instead
   # of running ESLint again
   if js is cache[filePath]?.js
+    debug.info "Reporting #{ cache[filePath].errors.length } errors from cache"
     return cache[filePath].errors
 
   else if js
@@ -154,6 +154,7 @@ lint = (textEditor) ->
     debug.timeEnd 'Transforming ESLint results'
 
     cache[filePath] = js: js, errors: errors
+    debug.table 'Cache:', cache
 
     debug.info "Reporting #{ errors.length } errors"
 
