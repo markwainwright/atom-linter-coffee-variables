@@ -52,14 +52,23 @@ _getESLintErrors = (js) ->
     return []
 
 
+_transformError = (error) ->
+  message      : error.message
+  variableName : error.message.match(/\".*\"/)?[0]?.replace(/\"/g, ''),
+  type         : if error.ruleId is 'no-unused-vars' then 'unused' else 'undefined'
+  line         : if typeof error.line is 'number' then error.line else 1
+  column       : if typeof error.column is 'number' then error.column else 0
+
+
+_filterError = (error) ->
+  # 1. try/catch blocks seem to generate an unused `error1` etc variable, so we'll ignore
+  # those
+  # 2. Allow unnecessary fat arrows to not trigger 'unused _this' message, since this is
+  # better handled by coffeelint.
+  return not /^error[0-9]$/.test(error.variableName) and error.variableName isnt '_this'
+
+
 _addOriginalCodePosition = (sourceMap, variables) -> (error) ->
-  variableName = error.message.match(/\".*\"/)?[0]?.replace(/\"/g, '')
-
-  # try/catch blocks always seem to generate an unused `error1` etc variable, so we'll
-  # ignore those
-  # TODO: Attempt to verify that these aren't variables from the user's own code
-  return if /^error[0-9]$/.test variableName
-
   # Query the source map for the original position
   positionFromSourcemap = sourceMap.originalPositionFor error
 
@@ -67,14 +76,13 @@ _addOriginalCodePosition = (sourceMap, variables) -> (error) ->
   # the same line as the first one was, so if that is the case, we'll resort to using
   # CoffeeScript's generated tokens to find out where the variable was first defined.
   firstVariableLine = (variables.map (v) -> v.line).sort((a, b) -> a-b)[0]
-  if (error.ruleId is 'no-unused-vars' and positionFromSourcemap.line <= firstVariableLine) or
+  if (error.type is 'unused' and positionFromSourcemap.line <= firstVariableLine) or
     not positionFromSourcemap.line
-      positionFromVariableLookup = _lookUpVariablePosition(variableName, variables)[0]
+      positionFromVariableLookup = _lookUpVariablePosition(error.variableName, variables)[0]
 
-  message      : error.message
-  variableName : variableName
-  line         : positionFromVariableLookup?.line   or positionFromSourcemap.line   or 1
-  column       : positionFromVariableLookup?.column or positionFromSourcemap.column or 0
+  error.line   = positionFromVariableLookup?.line or positionFromSourcemap?.line or 1
+  error.column = positionFromVariableLookup?.column or positionFromSourcemap?.column or 0
+  return error
 
 
 _lookUpVariablePosition = (variableName, variables) ->
@@ -87,15 +95,12 @@ _lookUpVariablePosition = (variableName, variables) ->
 
 
 _errorToLinterObj = (filePath) -> (error) ->
-  line   = if typeof error.line   is 'number' then error.line   else error.line   = 1
-  column = if typeof error.column is 'number' then error.column else error.column = 0
-
   type     : 'Warning'
   text     : error.message
   filePath : filePath
   range    : [
-    [line - 1, column]
-    [line - 1, column + error.variableName?.length or 100]
+    [error.line - 1, error.column]
+    [error.line - 1, error.column + error.variableName?.length or 100]
   ]
 
 
@@ -111,15 +116,20 @@ lint = (TextEditor) ->
 
   else if js
     debug.time 'Running ESLint'
-    errors = _getESLintErrors js
+
+    errors =
+      _getESLintErrors js
+      .map _transformError
+      .filter _filterError
       .map _addOriginalCodePosition sourceMap, variables
       .filter Boolean
       .map _errorToLinterObj TextEditor.getPath()
+
     cache = js: js, errors: errors
+
     debug.timeEnd 'Running ESLint'
+
     return errors
-      # Allow fat arrows to not trigger "this is not defined"
-      .filter (error) -> error.text.indexOf('"_this"') == -1
 
   else
     return []
