@@ -22,7 +22,7 @@ _getVariableTokens = (coffeeSource) ->
   coffee = require 'coffee-script'
 
   try
-    return coffee.tokens coffeeSource
+    coffee.tokens coffeeSource
       .filter (v) -> v.variable is true
       .map (v) ->
         name   : v[1]
@@ -30,12 +30,16 @@ _getVariableTokens = (coffeeSource) ->
         line   : v[2].first_line + 1
   catch error
     debug.warn 'Failed to compile:', error
-    {}
+    []
 
 
 _parseSourceMap = (rawSourceMap) ->
   SourceMapConsumer = require('source-map').SourceMapConsumer
-  new SourceMapConsumer JSON.parse rawSourceMap
+  try
+    new SourceMapConsumer JSON.parse rawSourceMap
+  catch error
+    debug.warn 'Failed to parse source map:', error
+    null
 
 
 _getEnvs = ->
@@ -83,7 +87,7 @@ _filterError = (error) ->
 
 _addOriginalCodePosition = (sourceMap, variables) -> (error) ->
   # Query the source map for the original position
-  positionFromSourcemap = sourceMap.originalPositionFor error
+  positionFromSourcemap = sourceMap?.originalPositionFor error
 
   # CoffeeScript sourcemaps say that all top-level variables were originally defined on
   # the same line as the first one was, so if that is the case, we'll resort to using
