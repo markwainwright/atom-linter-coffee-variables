@@ -21,7 +21,15 @@ module.exports =
   activate: ->
     debug.time 'Activating'
     atomPackageDeps.install packageName
+
+    # When a window is closed, remove the cached errors for that file to prevent memory
+    # leaks.
+    global.atom.workspace.observeTextEditors (textEditor) ->
+      textEditor?.onDidDestroy(
+        linterCoffeeVariables.removeTextEditorFromCache.bind(linterCoffeeVariables, textEditor))
+
     debug.timeEnd 'Activating'
+
 
   provideLinter: ->
     name          : 'CoffeeVariables'

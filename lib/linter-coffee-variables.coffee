@@ -128,8 +128,8 @@ lint = (textEditor) ->
 
   # If the compiled JS hasn't changed since the last time, use the cached errors instead
   # of running ESLint again
-  if js is cache.js
-    return cache.errors
+  if js is cache[filePath]?.js
+    return cache[filePath].errors
 
   else if js
     debug.time 'Parsing CoffeeScript tokens'
@@ -153,7 +153,7 @@ lint = (textEditor) ->
       .map _errorToLinterObj textEditor.getPath()
     debug.timeEnd 'Transforming ESLint results'
 
-    cache = js: js, errors: errors
+    cache[filePath] = js: js, errors: errors
 
     debug.info "Reporting #{ errors.length } errors"
 
@@ -163,8 +163,17 @@ lint = (textEditor) ->
     return []
 
 
+removeTextEditorFromCache = (textEditor) ->
+  filePath = textEditor?.getPath()
+
+  if filePath and cache[filePath]
+    delete cache[filePath]
+    debug.table 'Cache:', cache
+
+
 module.exports = {
   lint
+  removeTextEditorFromCache
   _getEnvs
   _compileToJS
 }
