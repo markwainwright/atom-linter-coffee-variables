@@ -1,29 +1,42 @@
-packageName = 'linter-coffee-variables'
-
 debug = require './debug'
 
+packageName = 'linter-coffee-variables'
 cache = {}
 
-
 _compileToJS = (coffeeSource) ->
-  SourceMapConsumer = require('source-map').SourceMapConsumer
-  coffee            = require 'coffee-script'
+  coffee = require 'coffee-script'
 
   try
-    results   = coffee.compile coffeeSource, sourceMap: true
-    variables = coffee.tokens coffeeSource
+    results = coffee.compile coffeeSource, sourceMap: true
+
+    return {
+      js           : results.js
+      rawSourceMap : results.v3SourceMap
+    }
+
+  catch error
+    debug.warn 'Failed to compile:', error
+    return {}
+
+
+_getVariableTokens = (coffeeSource) ->
+  coffee = require 'coffee-script'
+
+  try
+    return coffee.tokens coffeeSource
       .filter (v) -> v.variable is true
       .map (v) ->
         name   : v[1]
         column : v[2].first_column
         line   : v[2].first_line + 1
-
-    js        : results.js
-    sourceMap : new SourceMapConsumer JSON.parse results.v3SourceMap
-    variables : variables
   catch error
     debug.warn 'Failed to compile:', error
     {}
+
+
+_parseSourceMap = (rawSourceMap) ->
+  SourceMapConsumer = require('source-map').SourceMapConsumer
+  new SourceMapConsumer JSON.parse rawSourceMap
 
 
 _getEnvs = ->
@@ -104,9 +117,13 @@ _errorToLinterObj = (filePath) -> (error) ->
   ]
 
 
-lint = (TextEditor) ->
+lint = (textEditor) ->
+  coffeeSource = textEditor.getText()
+  filePath     = textEditor.getPath()
+
+  console.warn 'Cache:', cache
   debug.time 'Compiling to JS'
-  {js, sourceMap, variables} = _compileToJS TextEditor.getText()
+  {js, rawSourceMap} = _compileToJS coffeeSource
   debug.timeEnd 'Compiling to JS'
 
   # If the compiled JS hasn't changed since the last time, use the cached errors instead
@@ -115,19 +132,30 @@ lint = (TextEditor) ->
     return cache.errors
 
   else if js
-    debug.time 'Running ESLint'
+    debug.time 'Parsing CoffeeScript tokens'
+    variables = _getVariableTokens coffeeSource
+    debug.timeEnd 'Parsing CoffeeScript tokens'
 
-    errors =
-      _getESLintErrors js
+    debug.time 'Parsing sourcemap'
+    sourceMap = _parseSourceMap rawSourceMap
+    debug.timeEnd 'Parsing sourcemap'
+
+    debug.time 'Running ESLint'
+    errors = _getESLintErrors js
+    debug.timeEnd 'Running ESLint'
+
+    debug.time 'Transforming ESLint results'
+    errors = errors
       .map _transformError
       .filter _filterError
       .map _addOriginalCodePosition sourceMap, variables
       .filter Boolean
-      .map _errorToLinterObj TextEditor.getPath()
+      .map _errorToLinterObj textEditor.getPath()
+    debug.timeEnd 'Transforming ESLint results'
 
     cache = js: js, errors: errors
 
-    debug.timeEnd 'Running ESLint'
+    debug.info "Reporting #{ errors.length } errors"
 
     return errors
 
