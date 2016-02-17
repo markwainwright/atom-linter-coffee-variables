@@ -1,4 +1,4 @@
-packageName = 'linter-coffee-variables'
+packageName = require('../package').name
 
 inDebugMode = ->
   global.atom.config.get(packageName).debug

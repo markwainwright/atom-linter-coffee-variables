@@ -1,6 +1,5 @@
 debug = require './debug'
 
-packageName = 'linter-coffee-variables'
 cache = {}
 
 _compileToJS = (coffeeSource) ->
@@ -40,6 +39,7 @@ _parseSourceMap = (rawSourceMap) ->
 
 
 _getEnvs = ->
+  packageName = require('../package').name
   envs = global.atom.config.get(packageName)?.environments or []
   envs.reduce (obj, env) ->
     obj[env] = true
