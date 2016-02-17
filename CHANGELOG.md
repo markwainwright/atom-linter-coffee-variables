@@ -1,3 +1,7 @@
+## 0.5.0
+* Prevent unnecessary fat arrows from causing an `unused "_this"` error (#10)
+* Remove hard-coded details from specs so they can be run by anyone (#9)
+
 ## 0.4.1
 * Fix issue #1 - package failing to load due to config being loaded too early
 
