@@ -181,4 +181,5 @@ module.exports = {
   removeTextEditorFromCache
   _getEnvs
   _compileToJS
+  _parseSourceMap
 }

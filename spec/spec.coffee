@@ -13,7 +13,6 @@ global.atom =
       environments : ['browser', 'node', 'es6']
       debug        : false
 
-# Stub TextEditor
 textEditorStub =
   getText: -> fixture
   getPath: -> __dirname
@@ -22,15 +21,13 @@ textEditorStub =
 describe 'Linting a CoffeeScript fixture', ->
   it 'returns expected errors', ->
     errors = linterCoffeeVariables.lint textEditorStub
-    filepath = errors[0].filePath
-    expect(filepath).to.include('linter-coffee-variables/spec')
 
     expectedErrors =
       [
         {
           "type": "Warning",
           "text": "\"b\" is defined but never used",
-          "filePath": filepath,
+          "filePath": __dirname,
           "range": [
             [
               4,
@@ -45,7 +42,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"c\" is not defined.",
-          "filePath": filepath,
+          "filePath": __dirname,
           "range": [
             [
               6,
@@ -60,7 +57,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"d\" is not defined.",
-          "filePath": filepath,
+          "filePath": __dirname,
           "range": [
             [
               7,
@@ -75,7 +72,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"e\" is not defined.",
-          "filePath": filepath,
+          "filePath": __dirname,
           "range": [
             [
               10,
@@ -90,7 +87,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"f1a3\" is defined but never used",
-          "filePath": filepath,
+          "filePath": __dirname,
           "range": [
             [
               12,
@@ -105,7 +102,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"f1a4\" is not defined.",
-          "filePath": filepath,
+          "filePath": __dirname,
           "range": [
             [
               14,
@@ -120,7 +117,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"f2a3\" is not defined.",
-          "filePath": filepath,
+          "filePath": __dirname,
           "range": [
             [
               18,
@@ -135,7 +132,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"f2a4\" is not defined.",
-          "filePath": filepath,
+          "filePath": __dirname,
           "range": [
             [
               19,
@@ -150,7 +147,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"f4a1\" is defined but never used",
-          "filePath": filepath,
+          "filePath": __dirname,
           "range": [
             [
               24,
@@ -165,7 +162,7 @@ describe 'Linting a CoffeeScript fixture', ->
         {
           "type": "Warning",
           "text": "\"f4\" is not defined.",
-          "filePath": filepath,
+          "filePath": __dirname,
           "range": [
             [
               30,
@@ -191,13 +188,32 @@ describe '_getEnvs', ->
       es6     : true
 
 
-describe '_compileToJS', ->
-  it 'returns compiled data in correct shape', ->
-    {js, sourceMap, variables} = linterCoffeeVariables._compileToJS fixture
+{js, rawSourceMap} = linterCoffeeVariables._compileToJS fixture
 
+describe '_compileToJS', ->
+
+  it 'returns compiled data in correct shape', ->
     expect(js).to.be.a 'string'
     expect(js).to.contain '(function() {'
     expect(js).to.contain '}).call(this);'
 
-    expect(sourceMap).to.be.an 'object'
-    expect(variables).to.be.an 'array'
+    expect(rawSourceMap).to.be.a 'string'
+    # expect(variables).to.be.an 'array'
+
+
+describe '_parseSourceMap', ->
+
+  it 'returns parsed sourcemap object', ->
+    sourcemap = linterCoffeeVariables._parseSourceMap rawSourceMap
+    expect(sourcemap).to.be.an 'object'
+    expect(sourcemap.originalPositionFor).to.be.a 'function'
+
+  it 'returns null if sourcemap cannot be parsed', ->
+    sourcemap = linterCoffeeVariables._parseSourceMap null
+    expect(sourcemap).to.be.null
+
+    sourcemap = linterCoffeeVariables._parseSourceMap 'foobar'
+    expect(sourcemap).to.be.null
+
+    sourcemap = linterCoffeeVariables._parseSourceMap [1, 2]
+    expect(sourcemap).to.be.null
