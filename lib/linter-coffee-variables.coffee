@@ -1,9 +1,12 @@
 debug = require './debug'
+LRU = require('lru')
+coffee = require 'coffee-script'
 
-cache = {}
+cache = new LRU
+  max: 10
+  maxAge: 60 * 60 * 1000
 
 _compileToJS = (coffeeSource) ->
-  coffee = require 'coffee-script'
 
   try
     results = coffee.compile coffeeSource, sourceMap: true
@@ -19,15 +22,19 @@ _compileToJS = (coffeeSource) ->
 
 
 _getVariableTokens = (coffeeSource) ->
-  coffee = require 'coffee-script'
 
   try
-    coffee.tokens coffeeSource
-      .filter (v) -> v.variable is true
-      .map (v) ->
-        name   : v[1]
-        column : v[2].first_column
-        line   : v[2].first_line + 1
+    mappedTokens = []
+    tokens = coffee.tokens(coffeeSource)
+    for v in tokens
+      if v.variable is true
+        mappedTokens.push
+          name   : v[1]
+          column : v[2].first_column
+          line   : v[2].first_line + 1
+
+    mappedTokens
+
   catch error
     debug.warn 'Failed to compile:', error
     []
@@ -103,12 +110,14 @@ _addOriginalCodePosition = (sourceMap, variables) -> (error) ->
 
 
 _lookUpVariablePosition = (variableName, variables) ->
-  variables
-    .filter (v) ->
-      v.name is variableName
-    .map (v) ->
-      line   : v.line
-      column : v.column
+  mappedVariables = []
+  for v in variables
+    if v.name is variableName
+      mappedVariables.push
+        line   : v.line
+        column : v.column
+
+  mappedVariables
 
 
 _errorToLinterObj = (filePath) -> (error) ->
@@ -131,9 +140,9 @@ lint = (textEditor) ->
 
   # If the compiled JS hasn't changed since the last time, use the cached errors instead
   # of running ESLint again
-  if js is cache[filePath]?.js
-    debug.info "Reporting #{ cache[filePath].errors.length } errors from cache"
-    return cache[filePath].errors
+  if js is cache.get(filePath)?.js
+    debug.info "Reporting #{ cache.get(filePath).errors.length } errors from cache"
+    return cache.get(filePath).errors
 
   else if js
     debug.time 'Parsing CoffeeScript tokens'
@@ -149,15 +158,19 @@ lint = (textEditor) ->
     debug.timeEnd 'Running ESLint'
 
     debug.time 'Transforming ESLint results'
-    errors = errors
-      .map _transformError
-      .filter _filterError
-      .map _addOriginalCodePosition sourceMap, variables
-      .filter Boolean
-      .map _errorToLinterObj textEditor.getPath()
+    mappedErrors = []
+    for er in errors
+      er = _transformError(er)
+      if _filterError er
+        er =  _addOriginalCodePosition(sourceMap, variables)(er)
+        if Boolean(er)
+          mappedErrors.push _errorToLinterObj(textEditor.getPath())(er)
+
+    errors = mappedErrors
+
     debug.timeEnd 'Transforming ESLint results'
 
-    cache[filePath] = js: js, errors: errors
+    cache.set(filePath, js: js, errors: errors)
     debug.table 'Cache:', cache
 
     debug.info "Reporting #{ errors.length } errors"
@@ -171,8 +184,8 @@ lint = (textEditor) ->
 removeTextEditorFromCache = (textEditor) ->
   filePath = textEditor?.getPath()
 
-  if filePath and cache[filePath]
-    delete cache[filePath]
+  if filePath and cache.get(filePath)
+    cache.remove filePath
     debug.table 'Cache:', cache
 
 
