@@ -82,7 +82,7 @@ _filterError = (error) ->
   # those
   # 2. Allow unnecessary fat arrows to not trigger 'unused _this' message, since this is
   # better handled by coffeelint.
-  return not /^error[0-9]$/.test(error.variableName) and error.variableName isnt '_this'
+  return not /^error[0-9]$/.test(error.variableName) and error.variableName isnt '_this' and error.variableName isnt 'atom'
 
 
 _addOriginalCodePosition = (sourceMap, variables) -> (error) ->
