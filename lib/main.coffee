@@ -26,8 +26,8 @@ module.exports =
     # When a window is closed, remove the cached errors for that file to prevent memory
     # leaks.
     global.atom.workspace.observeTextEditors (textEditor) ->
-      textEditor?.onDidDestroy(
-        linterCoffeeVariables.removeTextEditorFromCache.bind(linterCoffeeVariables, textEditor))
+      textEditor?.onDidDestroy =>
+        linterCoffeeVariables.removeTextEditorFromCache(textEditor)
 
     debug.timeEnd 'Activating'
 

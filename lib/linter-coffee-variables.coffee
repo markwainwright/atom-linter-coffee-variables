@@ -1,5 +1,5 @@
 debug = require './debug'
-LRU = require('lru')
+LRU = require 'lru'
 coffee = require 'coffee-script'
 
 cache = new LRU
@@ -7,7 +7,6 @@ cache = new LRU
   maxAge: 60 * 60 * 1000
 
 _compileToJS = (coffeeSource) ->
-
   try
     results = coffee.compile coffeeSource, sourceMap: true
 
@@ -22,18 +21,17 @@ _compileToJS = (coffeeSource) ->
 
 
 _getVariableTokens = (coffeeSource) ->
-
   try
-    mappedTokens = []
-    tokens = coffee.tokens(coffeeSource)
-    for v in tokens
-      if v.variable is true
-        mappedTokens.push
-          name   : v[1]
-          column : v[2].first_column
-          line   : v[2].first_line + 1
+    tokens = []
 
-    mappedTokens
+    for token in coffee.tokens(coffeeSource)
+      if token.variable is true
+        tokens.push
+          name   : token[1]
+          column : token[2].first_column
+          line   : token[2].first_line + 1
+
+    tokens
 
   catch error
     debug.warn 'Failed to compile:', error
@@ -42,8 +40,10 @@ _getVariableTokens = (coffeeSource) ->
 
 _parseSourceMap = (rawSourceMap) ->
   SourceMapConsumer = require('source-map').SourceMapConsumer
+
   try
     new SourceMapConsumer JSON.parse rawSourceMap
+
   catch error
     debug.warn 'Failed to parse source map:', error
     null
@@ -84,7 +84,7 @@ _transformError = (error) ->
   column       : if typeof error.column is 'number' then error.column else 0
 
 
-_filterError = (error) ->
+_shouldIncludeError = (error) ->
   # 1. try/catch blocks seem to generate an unused `error1` etc variable, so we'll ignore
   # those
   # 2. Allow unnecessary fat arrows to not trigger 'unused _this' message, since this is
@@ -92,7 +92,7 @@ _filterError = (error) ->
   return not /^error[0-9]$/.test(error.variableName) and error.variableName isnt '_this'
 
 
-_addOriginalCodePosition = (sourceMap, variables) -> (error) ->
+_addOriginalCodePosition = (sourceMap, variables, error) ->
   # Query the source map for the original position
   positionFromSourcemap = sourceMap?.originalPositionFor error
 
@@ -102,25 +102,23 @@ _addOriginalCodePosition = (sourceMap, variables) -> (error) ->
   firstVariableLine = (variables.map (v) -> v.line).sort((a, b) -> a-b)[0]
   if (error.type is 'unused' and positionFromSourcemap.line <= firstVariableLine) or
     not positionFromSourcemap.line
-      positionFromVariableLookup = _lookUpVariablePosition(error.variableName, variables)[0]
+      positionFromVariableLookup = _lookUpVariablePosition(error.variableName, variables)
 
   error.line   = positionFromVariableLookup?.line or positionFromSourcemap?.line or 1
   error.column = positionFromVariableLookup?.column or positionFromSourcemap?.column or 0
-  return error
+  error
 
 
 _lookUpVariablePosition = (variableName, variables) ->
-  mappedVariables = []
   for v in variables
     if v.name is variableName
-      mappedVariables.push
+      return {
         line   : v.line
         column : v.column
+      }
 
-  mappedVariables
 
-
-_errorToLinterObj = (filePath) -> (error) ->
+_errorToLinterObj = (filePath, error) ->
   type     : 'Warning'
   text     : error.message
   filePath : filePath
@@ -158,24 +156,23 @@ lint = (textEditor) ->
     debug.timeEnd 'Running ESLint'
 
     debug.time 'Transforming ESLint results'
-    mappedErrors = []
-    for er in errors
-      er = _transformError(er)
-      if _filterError er
-        er =  _addOriginalCodePosition(sourceMap, variables)(er)
-        if Boolean(er)
-          mappedErrors.push _errorToLinterObj(textEditor.getPath())(er)
 
-    errors = mappedErrors
+    outputErrors = []
+    for error in errors
+      error = _transformError(error)
+      if _shouldIncludeError(error)
+        error = _addOriginalCodePosition(sourceMap, variables, error)
+        if error
+          outputErrors.push _errorToLinterObj(textEditor.getPath(), error)
 
     debug.timeEnd 'Transforming ESLint results'
 
-    cache.set(filePath, js: js, errors: errors)
-    debug.table 'Cache:', cache
+    cache.set(filePath, js: js, errors: outputErrors)
+    debug.table 'Updated cache:', cache.cache
 
     debug.info "Reporting #{ errors.length } errors"
 
-    return errors
+    return outputErrors
 
   else
     return []
@@ -186,7 +183,7 @@ removeTextEditorFromCache = (textEditor) ->
 
   if filePath and cache.get(filePath)
     cache.remove filePath
-    debug.table 'Cache:', cache
+    debug.table "Removed #{ filePath } from cache. New cache:", cache.cache
 
 
 module.exports = {
