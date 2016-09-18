@@ -29,3 +29,5 @@ f1() # ok
 f2() # ok
 f3() # ok
 f4() # f4 not defined
+
+atom.workspace.observeTextEditors() # no undefined error
