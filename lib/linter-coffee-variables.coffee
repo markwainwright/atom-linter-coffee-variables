@@ -134,6 +134,8 @@ lint = (textEditor) ->
   coffeeSource = textEditor.getText()
   filePath     = textEditor.getPath()
 
+  return [] if filePath.endsWith '.cson'
+
   debug.time 'Compiling to JS'
   {js, rawSourceMap} = _compileToJS coffeeSource
   debug.timeEnd 'Compiling to JS'
