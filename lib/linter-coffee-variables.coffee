@@ -6,9 +6,15 @@ cache = new LRU
   max: 10
   maxAge: 60 * 60 * 1000
 
-_compileToJS = (coffeeSource) ->
+_compileToJS = (coffeeSource, textEditor) ->
+  {scopeName} = textEditor.getGrammar()
+
+  options =
+    sourceMap: true
+    literate: true if scopeName is 'source.litcoffee'
+
   try
-    results = coffee.compile coffeeSource, sourceMap: true
+    results = coffee.compile coffeeSource, options
 
     return {
       js           : results.js
@@ -134,8 +140,10 @@ lint = (textEditor) ->
   coffeeSource = textEditor.getText()
   filePath     = textEditor.getPath()
 
+  return [] if filePath.endsWith '.cson'
+
   debug.time 'Compiling to JS'
-  {js, rawSourceMap} = _compileToJS coffeeSource
+  {js, rawSourceMap} = _compileToJS coffeeSource, textEditor
   debug.timeEnd 'Compiling to JS'
 
   # If the compiled JS hasn't changed since the last time, use the cached errors instead
