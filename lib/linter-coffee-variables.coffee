@@ -184,7 +184,7 @@ lint = (textEditor) ->
     debug.log "Added #{textEditor.getTitle()} to cache. New cache:"
     debug.logCache cache
 
-    debug.info "Reporting #{ errors.length } errors"
+    debug.info "Reporting #{ outputErrors.length } errors"
 
     return outputErrors
 
