@@ -28,3 +28,11 @@ module.exports =
     if inDebugMode()
       console.log "[#{ packageName }] #{ message }"
       console.table obj
+
+  logCache: (cache) ->
+    if inDebugMode()
+      table = {}
+      table[path] = cache.get(path) for path in cache.keys
+      console.table(table)
+    else
+      console.log null

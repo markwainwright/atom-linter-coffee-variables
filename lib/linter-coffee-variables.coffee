@@ -180,8 +180,9 @@ lint = (textEditor) ->
 
     debug.timeEnd 'Transforming ESLint results'
 
-    cache.set(filePath, js: js, errors: outputErrors)
-    debug.table 'Updated cache:', cache.cache
+    cache.set(filePath, {js: js, errors: outputErrors})
+    debug.log "Added #{textEditor.getTitle()} to cache. New cache:"
+    debug.logCache cache
 
     debug.info "Reporting #{ errors.length } errors"
 
@@ -196,7 +197,8 @@ removeTextEditorFromCache = (textEditor) ->
 
   if filePath and cache.get(filePath)
     cache.remove filePath
-    debug.table "Removed #{ filePath } from cache. New cache:", cache.cache
+    debug.log "Removed #{ textEditor.getTitle() } from cache. New cache:"
+    debug.logCache cache
 
 
 module.exports = {
