@@ -150,9 +150,10 @@ lint = (textEditor) ->
 
   # If the compiled JS hasn't changed since the last time, use the cached errors instead
   # of running ESLint again
-  if js is cache.get(filePath)?.js
-    debug.info "Reporting #{ cache.get(filePath).errors.length } errors from cache"
-    return cache.get(filePath).errors
+  cached = cache.get(filePath)
+  if cached and js is cached.js
+    debug.info "Reporting #{ cached.errors?.length or 0 } errors from cache"
+    return cached.errors or []
 
   else if js
     debug.time 'Parsing CoffeeScript tokens'
