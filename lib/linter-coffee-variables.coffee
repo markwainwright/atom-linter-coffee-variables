@@ -1,6 +1,8 @@
 debug = require './debug'
 LRU = require 'lru'
 coffee = require 'coffee-script'
+pkg = require '../package'
+try {check_scope} = require '../coffeelint'
 
 cache = new LRU
   max: 10
@@ -56,8 +58,7 @@ _parseSourceMap = (rawSourceMap) ->
 
 
 _getEnvs = ->
-  packageName = require('../package').name
-  envs = global.atom.config.get(packageName)?.environments or []
+  envs = global.atom.config.get(pkg.name)?.environments or []
   envs.reduce (obj, env) ->
     obj[env] = true
     obj
@@ -140,7 +141,8 @@ lint = (textEditor) ->
   coffeeSource = textEditor.getText()
   filePath     = textEditor.getPath()
 
-  return [] if filePath.endsWith '.cson'
+  check_scope ?= pkg.coffeelintConfig?.check_scope
+  return [] if check_scope? or filePath.endsWith '.cson'
 
   debug.time 'Compiling to JS'
   {js, rawSourceMap} = _compileToJS coffeeSource, textEditor
