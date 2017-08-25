@@ -31,8 +31,9 @@ module.exports =
 
   logCache: (cache) ->
     if inDebugMode()
-      table = {}
-      table[path] = cache.get(path) for path in cache.keys
-      console.table(table)
-    else
-      console.log null
+      if cache.keys?.length
+        table = {}
+        table[path] = cache.get(path) for path in cache.keys
+        console.table table
+      else
+        console.log null
