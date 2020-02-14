@@ -13,8 +13,8 @@
     "linter"
   ],
   "dependencies": {
-    "atom-package-deps": "^2.0.3",
-    "coffee-script": "^1.10.0",
+    "atom-package-deps": "^5.1.0",
+    "coffee-script": "^1.12.7",
     "eslint": "^1.6.0",
     "loophole": "^1.1.0",
     "lru": "3.1.0",
