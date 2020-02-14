@@ -35,6 +35,6 @@ module.exports =
   provideLinter: ->
     name          : 'CoffeeVariables'
     scope         : 'file'
-    lintOnFly     : true
+    lintsOnChange : true
     lint          : linterCoffeeVariables.lint
     grammarScopes : ['source.coffee', 'source.litcoffee']

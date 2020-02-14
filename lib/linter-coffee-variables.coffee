@@ -128,13 +128,14 @@ _lookUpVariablePosition = (variableName, variables) ->
 
 
 _errorToLinterObj = (filePath, error) ->
-  type     : 'Warning'
-  text     : error.message
-  filePath : filePath
-  range    : [
-    [error.line - 1, error.column]
-    [error.line - 1, error.column + error.variableName?.length or 100]
-  ]
+  severity: 'warning'
+  excerpt: error.message
+  location:
+    file: filePath
+    position: [
+      [error.line - 1, error.column]
+      [error.line - 1, error.column + error.variableName?.length or 100]
+    ]
 
 
 lint = (textEditor) ->
