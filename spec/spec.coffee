@@ -16,6 +16,8 @@ global.atom =
 textEditorStub =
   getText: -> fixture
   getPath: -> __dirname
+  getGrammar: -> { scopeName: 'source.coffee' }
+  getTitle: -> ''
 
 
 describe 'Linting a CoffeeScript fixture', ->
@@ -25,154 +27,174 @@ describe 'Linting a CoffeeScript fixture', ->
     expectedErrors =
       [
         {
-          "type": "Warning",
-          "text": "\"b\" is defined but never used",
-          "filePath": __dirname,
-          "range": [
-            [
-              4,
-              0
-            ],
-            [
-              4,
-              1
+          "severity": "warning",
+          "excerpt": "\"b\" is defined but never used",
+          "location": {
+            "file": __dirname,
+            "position": [
+              [
+                4,
+                0
+              ],
+              [
+                4,
+                1
+              ]
             ]
-          ]
+          }
         },
         {
-          "type": "Warning",
-          "text": "\"c\" is not defined.",
-          "filePath": __dirname,
-          "range": [
-            [
-              6,
-              1
-            ],
-            [
-              6,
-              2
+          "severity": "warning",
+          "excerpt": "\"c\" is not defined.",
+          "location": {
+            "file": __dirname,
+            "position": [
+              [
+                6,
+                1
+              ],
+              [
+                6,
+                2
+              ]
             ]
-          ]
+          }
         },
         {
-          "type": "Warning",
-          "text": "\"d\" is not defined.",
-          "filePath": __dirname,
-          "range": [
-            [
-              7,
-              2
-            ],
-            [
-              7,
-              3
+          "severity": "warning",
+          "excerpt": "\"d\" is not defined.",
+          "location": {
+            "file": __dirname,
+            "position": [
+              [
+                7,
+                2
+              ],
+              [
+                7,
+                3
+              ]
             ]
-          ]
+          }
         },
         {
-          "type": "Warning",
-          "text": "\"e\" is not defined.",
-          "filePath": __dirname,
-          "range": [
-            [
-              10,
-              2
-            ],
-            [
-              10,
-              3
+          "severity": "warning",
+          "excerpt": "\"e\" is not defined.",
+          "location": {
+            "file": __dirname,
+            "position": [
+              [
+                10,
+                2
+              ],
+              [
+                10,
+                3
+              ]
             ]
-          ]
+          }
         },
         {
-          "type": "Warning",
-          "text": "\"f1a3\" is defined but never used",
-          "filePath": __dirname,
-          "range": [
-            [
-              12,
-              18
-            ],
-            [
-              12,
-              22
+          "severity": "warning",
+          "excerpt": "\"f1a3\" is defined but never used",
+          "location": {
+            "file": __dirname,
+            "position": [
+              [
+                12,
+                18
+              ],
+              [
+                12,
+                22
+              ]
             ]
-          ]
+          }
         },
         {
-          "type": "Warning",
-          "text": "\"f1a4\" is not defined.",
-          "filePath": __dirname,
-          "range": [
-            [
-              14,
-              2
-            ],
-            [
-              14,
-              6
+          "severity": "warning",
+          "excerpt": "\"f1a4\" is not defined.",
+          "location": {
+            "file": __dirname,
+            "position": [
+              [
+                14,
+                2
+              ],
+              [
+                14,
+                6
+              ]
             ]
-          ]
+          }
         },
         {
-          "type": "Warning",
-          "text": "\"f2a3\" is not defined.",
-          "filePath": __dirname,
-          "range": [
-            [
-              18,
-              2
-            ],
-            [
-              18,
-              6
+          "severity": "warning",
+          "excerpt": "\"f2a3\" is not defined.",
+          "location": {
+            "file": __dirname,
+            "position": [
+              [
+                18,
+                2
+              ],
+              [
+                18,
+                6
+              ]
             ]
-          ]
+          }
         },
         {
-          "type": "Warning",
-          "text": "\"f2a4\" is not defined.",
-          "filePath": __dirname,
-          "range": [
-            [
-              19,
-              2
-            ],
-            [
-              19,
-              6
+          "severity": "warning",
+          "excerpt": "\"f2a4\" is not defined.",
+          "location": {
+            "file": __dirname,
+            "position": [
+              [
+                19,
+                2
+              ],
+              [
+                19,
+                6
+              ]
             ]
-          ]
+          }
         },
         {
-          "type": "Warning",
-          "text": "\"f4a1\" is defined but never used",
-          "filePath": __dirname,
-          "range": [
-            [
-              24,
-              6
-            ],
-            [
-              24,
-              10
+          "severity": "warning",
+          "excerpt": "\"f4a1\" is defined but never used",
+          "location": {
+            "file": __dirname,
+            "position": [
+              [
+                24,
+                6
+              ],
+              [
+                24,
+                10
+              ]
             ]
-          ]
+          }
         },
         {
-          "type": "Warning",
-          "text": "\"f4\" is not defined.",
-          "filePath": __dirname,
-          "range": [
-            [
-              30,
-              0
-            ],
-            [
-              30,
-              2
+          "severity": "warning",
+          "excerpt": "\"f4\" is not defined.",
+          "location": {
+            "file": __dirname,
+            "position": [
+              [
+                30,
+                0
+              ],
+              [
+                30,
+                2
+              ]
             ]
-          ]
+          }
         }
       ]
 
@@ -188,7 +210,7 @@ describe '_getEnvs', ->
       es6     : true
 
 
-{js, rawSourceMap} = linterCoffeeVariables._compileToJS fixture
+{js, rawSourceMap} = linterCoffeeVariables._compileToJS fixture, textEditorStub
 
 describe '_compileToJS', ->
 
