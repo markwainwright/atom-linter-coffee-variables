@@ -33,7 +33,7 @@ _getVariableTokens = (coffeeSource) ->
     tokens = []
 
     for token in coffee.tokens(coffeeSource)
-      if token.variable is true
+      if token[0] is 'IDENTIFIER'
         tokens.push
           name   : token[1]
           column : token[2].first_column
